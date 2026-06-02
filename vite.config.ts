@@ -8,6 +8,8 @@ export default defineConfig({
   server: {
     port: 8080,
     open: true,
+    host: true,
+    allowedHosts: ['.monkeycode-ai.online'],
   },
   define: {
     APP_VERSION: JSON.stringify(process.env.npm_package_version),

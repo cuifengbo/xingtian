@@ -1,5 +1,6 @@
 import { MapItem } from "./compents/MapItem";
 import { baseConfig } from "../../baseConfig";
+import { engine } from "../../getEngine";
 enum GameStatus {
   START = "start",
   RUNNING = "running",
@@ -25,8 +26,6 @@ class GameDataModel {
       const commandArray = command.split("_");
       const commandType = commandArray[0];
       const commandValue = commandArray[1];
-      console.log("commandType:", commandType);
-      console.log("commandValue:", commandValue);
       switch (commandType) {
         case "w":
           this.camera.y -= Number(commandValue) * baseConfig.defaultCellSize * gameDataModel.getCamera().zoom;
@@ -41,20 +40,49 @@ class GameDataModel {
           this.camera.x += Number(commandValue) * baseConfig.defaultCellSize * gameDataModel.getCamera().zoom;
           break;
         case "zoomin":
-          console.log("zoomin_", commandValue);
-          if(this.camera.zoom < baseConfig.zoomMax) {
-            this.camera.zoom -= Number(commandValue) / 1000;  
-          }
-          if(this.camera.zoom > baseConfig.zoomMax) {
-            this.camera.zoom = baseConfig.zoomMax;
+          {
+            const zoomDelta = Math.abs(Number(commandValue)) / 1000;
+            const targetZoom = this.camera.zoom + zoomDelta;
+            const actualZoom = Math.min(targetZoom, baseConfig.zoomMax);
+            
+            // 如果有鼠标位置参数，以鼠标位置为中心缩放
+            if (commandArray.length >= 4) {
+              const mouseX = Number(commandArray[2]);
+              const mouseY = Number(commandArray[3]);
+              
+              // 计算鼠标在世界空间的位置（使用当前 zoom）
+              const worldX = this.camera.x + (mouseX - 0.5) * engine().screen.width / this.camera.zoom;
+              const worldY = this.camera.y + (mouseY - 0.5) * engine().screen.height / this.camera.zoom;
+              
+              // 调整相机位置，使鼠标位置在缩放后保持不变
+              this.camera.x = worldX - (mouseX - 0.5) * engine().screen.width / actualZoom;
+              this.camera.y = worldY - (mouseY - 0.5) * engine().screen.height / actualZoom;
+            }
+            
+            this.camera.zoom = actualZoom;
           }
           break;
         case "zoomout":
-          if(this.camera.zoom > baseConfig.zoomMin) {
-            this.camera.zoom -= Number(commandValue) / 1000;
-          }
-          if(this.camera.zoom < baseConfig.zoomMin) {
-            this.camera.zoom = baseConfig.zoomMin;
+          {
+            const zoomDelta = Math.abs(Number(commandValue)) / 1000;
+            const targetZoom = this.camera.zoom - zoomDelta;
+            const actualZoom = Math.max(targetZoom, baseConfig.zoomMin);
+            
+            // 如果有鼠标位置参数，以鼠标位置为中心缩放
+            if (commandArray.length >= 4) {
+              const mouseX = Number(commandArray[2]);
+              const mouseY = Number(commandArray[3]);
+              
+              // 计算鼠标在世界空间的位置（使用当前 zoom）
+              const worldX = this.camera.x + (mouseX - 0.5) * engine().screen.width / this.camera.zoom;
+              const worldY = this.camera.y + (mouseY - 0.5) * engine().screen.height / this.camera.zoom;
+              
+              // 调整相机位置，使鼠标位置在缩放后保持不变
+              this.camera.x = worldX - (mouseX - 0.5) * engine().screen.width / actualZoom;
+              this.camera.y = worldY - (mouseY - 0.5) * engine().screen.height / actualZoom;
+            }
+            
+            this.camera.zoom = actualZoom;
           }
           break;
         default:
