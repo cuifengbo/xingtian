@@ -181,7 +181,7 @@ export class GameScreen extends Container {
     });
     gameDataModel.update();
     debuger.update();
-   // this.mainContainer.position.set(-gameDataModel.getCamera().x + engine().screen.width/2, -gameDataModel.getCamera().y + engine().screen.height/2);
+    this.mainContainer.position.set(-gameDataModel.getCamera().x + engine().screen.width/2, -gameDataModel.getCamera().y + engine().screen.height/2);
     this.mainContainer.scale.set(gameDataModel.getCamera().zoom);
   }
 

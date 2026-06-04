@@ -185,11 +185,15 @@ class Controller {
   private handleWheel(event: WheelEvent) {
     event.preventDefault();
     if (this.clearZoomTimeout) clearTimeout(this.clearZoomTimeout);
+    
+    const mouseX = event.clientX / engine().screen.width;
+    const mouseY = event.clientY / engine().screen.height;
+    
     let newCommand: string | null = null;
     if (event.deltaY < 0) {
-      newCommand = `zoomin_${event.deltaY}`;
+      newCommand = `zoomin_${event.deltaY}_${mouseX}_${mouseY}`;
     } else if (event.deltaY > 0) {
-      newCommand = `zoomout_${event.deltaY}`;
+      newCommand = `zoomout_${event.deltaY}_${mouseX}_${mouseY}`;
     }
     if (newCommand !== this.currentZoomCommand) {
       if (this.currentZoomCommand) {
@@ -209,7 +213,6 @@ class Controller {
       }
       this.clearZoomTimeout = null;
     }, 100);
-    console.log(`Scroll: ${event.deltaY > 0 ? "down" : "up"}, delta: ${event.deltaY}, command: ${newCommand}`);
   }
 
   // ==================== 清理资源 ====================
